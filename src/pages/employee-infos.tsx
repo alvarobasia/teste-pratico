@@ -18,12 +18,13 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { useDispatch, useSelector } from "react-redux";
-import { add } from "@/redux/employee-slice.ts";
+import { add, edit } from "@/redux/employee-slice.ts";
 import { getIRBase } from "@/utils/get-IR-base.ts";
 import { getIRDiscount } from "@/utils/get-IR-discount.ts";
 import { useNavigate, useLocation } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { RootState } from "@/redux/store.ts";
+import { Employee } from "@/types/employee.ts";
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
@@ -47,6 +48,8 @@ export default function EmployeeInfos() {
   const navigate = useNavigate();
   const location = useLocation();
   const { employees } = useSelector((state: RootState) => state.employee);
+  const [isOnEditMode, setIsOnEditMode] = useState(false);
+  const [id, setId] = useState<string | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,11 +64,12 @@ export default function EmployeeInfos() {
   useEffect(() => {
     if (location.pathname.includes("edit")) {
       const id = location.pathname.split("/")[2];
-      console.log(id);
+      setId(id);
       const employeeToEdit = employees.find((emp) => emp.id === id);
 
       if (!employeeToEdit) navigate("/");
 
+      setIsOnEditMode(true);
       form.setValue("name", employeeToEdit!.name);
       form.setValue("cpf", employeeToEdit!.cpf);
       form.setValue("grossSalary", employeeToEdit!.grossSalary);
@@ -74,7 +78,7 @@ export default function EmployeeInfos() {
         employeeToEdit!.socialSecurityDiscount,
       );
     }
-  }, []);
+  }, [employees, form, location.pathname, navigate]);
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     const { grossSalary, socialSecurityDiscount, dependents } = values;
 
@@ -83,6 +87,32 @@ export default function EmployeeInfos() {
       socialSecurityDiscount,
       dependents,
     );
+    if (isOnEditMode) {
+      editEmployee(values, irBaseValue);
+      return;
+    }
+    addEmployee(values, irBaseValue);
+  };
+
+  const editEmployee = (
+    values: z.infer<typeof formSchema>,
+    irBaseValue: number,
+  ) => {
+    dispatch(
+      edit({
+        ...values,
+        id,
+        irBaseValue,
+        irrfDiscount: getIRDiscount(irBaseValue),
+      } as Employee),
+    );
+    navigate("/");
+  };
+
+  const addEmployee = (
+    values: z.infer<typeof formSchema>,
+    irBaseValue: number,
+  ) => {
     dispatch(
       add({
         ...values,
@@ -97,7 +127,8 @@ export default function EmployeeInfos() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Adicionar Funcionário</CardTitle>
+        {!isOnEditMode && <CardTitle>Adicionar Funcionário</CardTitle>}
+        {isOnEditMode && <CardTitle>Editar Funcionário</CardTitle>}
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -199,7 +230,9 @@ export default function EmployeeInfos() {
               <Button type="button" onClick={() => navigate("/")}>
                 Voltar
               </Button>
-              <Button type="submit">{"Adicionar"}</Button>
+              <Button type="submit">
+                {isOnEditMode ? "Editar" : "Adicionar"}
+              </Button>
             </div>
           </form>
         </Form>
