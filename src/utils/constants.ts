@@ -1,0 +1,1 @@
+export const DEPENDENCY_DEDUCTION = 189.59;
