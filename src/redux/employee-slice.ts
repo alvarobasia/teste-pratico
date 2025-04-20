@@ -16,7 +16,6 @@ const employeeSlice = createSlice({
   initialState,
   reducers: {
     add: (state, action: PayloadAction<Employee>) => {
-      console.log(action.payload);
       return {
         ...state,
         employees: [...state.employees, action.payload],
