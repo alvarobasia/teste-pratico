@@ -23,4 +23,4 @@ npm run dev
 
 O projeto estará executando em http://localhost:5173
 
-e também esta em teste-pratico-nu.vercel.app
+e também esta em [teste-pratico-nu.vercel.app](teste-pratico-nu.vercel.app)
