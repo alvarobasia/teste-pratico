@@ -3,12 +3,14 @@ import { Employee } from "@/types/employee.ts";
 import { filterEmployee } from "@/utils/filter-employee.ts";
 type INITIAL_STATE = {
   employees: Employee[];
-  filteredEmployees: Employee[];
+  allEmployees: Employee[];
+  activeFilter: { name: string; cpf: string };
 };
 
 const initialState: INITIAL_STATE = {
   employees: [],
-  filteredEmployees: [],
+  allEmployees: [],
+  activeFilter: { name: "", cpf: "" },
 };
 
 const employeeSlice = createSlice({
@@ -24,17 +26,17 @@ const employeeSlice = createSlice({
     add: (state, action: PayloadAction<Employee>) => {
       return {
         ...state,
-        employees: [...state.employees, action.payload],
+        allEmployees: [...state.allEmployees, action.payload],
       };
     },
     edit: (state, action: PayloadAction<Employee>) => {
-      const index = state.employees.findIndex(
+      const index = state.allEmployees.findIndex(
         (emp) => emp.id === action.payload.id,
       );
       if (index !== -1) {
         return {
           ...state,
-          employees: state.employees.map((emp, i) =>
+          allEmployees: state.allEmployees.map((emp, i) =>
             i === index ? { ...emp, ...action.payload } : emp,
           ),
         };
@@ -43,18 +45,19 @@ const employeeSlice = createSlice({
     remove: (state, action: PayloadAction<string>) => {
       return {
         ...state,
+        allEmployees: state.allEmployees.filter(
+          (emp) => emp.id !== action.payload,
+        ),
         employees: state.employees.filter((emp) => emp.id !== action.payload),
       };
     },
     filter: (state, action: PayloadAction<{ name: string; cpf: string }>) => {
-      const result = filterEmployee(
-        action.payload.name,
-        action.payload.cpf,
-        state.employees,
-      );
+      const { cpf, name } = action.payload;
+
       return {
         ...state,
-        filteredEmployees: result,
+        activeFilter: action.payload,
+        employees: filterEmployee(name, cpf, state.allEmployees),
       };
     },
   },
