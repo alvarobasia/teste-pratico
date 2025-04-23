@@ -4,13 +4,11 @@ import { filterEmployee } from "@/utils/filter-employee.ts";
 type INITIAL_STATE = {
   employees: Employee[];
   allEmployees: Employee[];
-  activeFilter: { name: string; cpf: string };
 };
 
 const initialState: INITIAL_STATE = {
   employees: [],
   allEmployees: [],
-  activeFilter: { name: "", cpf: "" },
 };
 
 const employeeSlice = createSlice({
@@ -56,7 +54,6 @@ const employeeSlice = createSlice({
 
       return {
         ...state,
-        activeFilter: action.payload,
         employees: filterEmployee(name, cpf, state.allEmployees),
       };
     },
