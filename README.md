@@ -22,3 +22,5 @@ npm run dev
 ```
 
 O projeto estará executando em http://localhost:5173
+
+e também esta em [teste-pratico-nu.vercel.app](https://teste-pratico-nu.vercel.app)
