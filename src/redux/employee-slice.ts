@@ -15,6 +15,12 @@ const employeeSlice = createSlice({
   name: "employee",
   initialState,
   reducers: {
+    init: (state) => {
+      return {
+        ...state,
+        employees: state.allEmployees,
+      };
+    },
     add: (state, action: PayloadAction<Employee>) => {
       return {
         ...state,
@@ -54,5 +60,5 @@ const employeeSlice = createSlice({
   },
 });
 
-export const { add, remove, edit, filter } = employeeSlice.actions;
+export const { add, remove, edit, filter, init } = employeeSlice.actions;
 export default employeeSlice.reducer;
