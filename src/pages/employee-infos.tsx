@@ -25,24 +25,7 @@ import { useNavigate, useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import { RootState } from "@/redux/store.ts";
 import { Employee } from "@/types/employee.ts";
-
-const formSchema = z.object({
-  name: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
-  cpf: z
-    .string()
-    .length(11, { message: "CPF deve ter 11 dígitos" })
-    .regex(/^\d+$/, { message: "CPF deve conter apenas números" }),
-  grossSalary: z.coerce
-    .number()
-    .positive({ message: "Salário deve ser maior que zero" }),
-  socialSecurityDiscount: z.coerce
-    .number()
-    .min(0, { message: "Desconto não pode ser negativo" }),
-  dependents: z.coerce
-    .number()
-    .int({ message: "Número de dependentes deve ser um número inteiro" })
-    .min(0, { message: "Número de dependentes não pode ser negativo" }),
-});
+import { employeeFormSchema } from "@/schemas/employee-form-shema.ts";
 
 export default function EmployeeInfos() {
   const navigate = useNavigate();
@@ -50,8 +33,8 @@ export default function EmployeeInfos() {
   const { employees } = useSelector((state: RootState) => state.employee);
   const [isOnEditMode, setIsOnEditMode] = useState(false);
   const [id, setId] = useState<string | null>(null);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof employeeFormSchema>>({
+    resolver: zodResolver(employeeFormSchema),
     defaultValues: {
       name: "",
       cpf: "",
@@ -79,7 +62,7 @@ export default function EmployeeInfos() {
       );
     }
   }, [employees, form, location.pathname, navigate]);
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = (values: z.infer<typeof employeeFormSchema>) => {
     const { grossSalary, socialSecurityDiscount, dependents } = values;
 
     const irBaseValue = getIRBase(
