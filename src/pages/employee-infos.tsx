@@ -64,46 +64,35 @@ export default function EmployeeInfos() {
   }, [employees, form, location.pathname, navigate]);
   const handleSubmit = (values: z.infer<typeof employeeFormSchema>) => {
     const { grossSalary, socialSecurityDiscount, dependents } = values;
-
     const irBaseValue = getIRBase(
       grossSalary,
       socialSecurityDiscount,
       dependents,
     );
-    if (isOnEditMode) {
-      editEmployee(values, irBaseValue);
-      return;
-    }
-    addEmployee(values, irBaseValue);
+
+    handleEmployeeOperation(values, irBaseValue, {
+      type: isOnEditMode ? "edit" : "add",
+      id: isOnEditMode ? id! : undefined,
+    });
   };
 
-  const editEmployee = (
-    values: z.infer<typeof formSchema>,
+  const handleEmployeeOperation = (
+    values: z.infer<typeof employeeFormSchema>,
     irBaseValue: number,
+    operation: {
+      type: "add" | "edit";
+      id?: string;
+    },
   ) => {
-    dispatch(
-      edit({
-        ...values,
-        id,
-        irBaseValue,
-        irrfDiscount: getIRDiscount(irBaseValue),
-      } as Employee),
-    );
-    navigate("/");
-  };
+    const employeeData = {
+      ...values,
+      id: operation.type === "edit" ? operation.id! : crypto.randomUUID(),
+      irBaseValue,
+      irrfDiscount: getIRDiscount(irBaseValue),
+    } as Employee;
 
-  const addEmployee = (
-    values: z.infer<typeof formSchema>,
-    irBaseValue: number,
-  ) => {
-    dispatch(
-      add({
-        ...values,
-        id: crypto.randomUUID(),
-        irBaseValue,
-        irrfDiscount: getIRDiscount(irBaseValue),
-      }),
-    );
+    const action = operation.type === "edit" ? edit : add;
+    dispatch(action(employeeData));
     navigate("/");
   };
 
