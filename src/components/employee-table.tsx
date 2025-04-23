@@ -28,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store.ts";
 import { remove } from "@/redux/employee-slice.ts";
 import { useNavigate } from "react-router";
+import { formatCPF } from "@/utils/format-cpf.ts";
 
 export default function EmployeeTable() {
   const { employees } = useSelector((state: RootState) => state.employee);
@@ -39,7 +40,6 @@ export default function EmployeeTable() {
       dispatch(remove(employeeToDelete));
     }
   };
-
   const handleEdit = (employee: Employee) => {
     navigate(`/edit/${employee.id}`);
   };
@@ -70,12 +70,7 @@ export default function EmployeeTable() {
             employees.map((employee: Employee) => (
               <TableRow key={employee.id}>
                 <TableCell>{employee.name}</TableCell>
-                <TableCell>
-                  {employee.cpf.replace(
-                    /(\d{3})(\d{3})(\d{3})(\d{2})/,
-                    "$1.$2.$3-$4",
-                  )}
-                </TableCell>
+                <TableCell>{formatCPF(employee.cpf)}</TableCell>
                 <TableCell className="text-right">
                   {formatCurrency(employee.grossSalary)}
                 </TableCell>
