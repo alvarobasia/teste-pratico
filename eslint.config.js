@@ -24,13 +24,5 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
     },
-    overrides: [
-      {
-        files: ["tests/**/*"],
-        env: {
-          jest: true,
-        },
-      },
-    ],
   },
 );
